@@ -47,6 +47,9 @@ module CleanUp
     # control/hashes/hashfile_upload_*
     cleanDir('control/hashes/hashfile_upload_*')
 
+    # control/pcaps/pcap_upload_*
+    cleanDir('control/pcaps/pcap_upload_*')
+
     # control/logs/*.log
     cleanDir('control/logs/*.log')
 
@@ -64,6 +67,9 @@ module CleanUp
 
       # control/hashes/hashfile_*.txt
       cleanDir('control/hashes/hashfile_*.txt')
+
+      # control/pcaps/pcap_*.hccapx
+      cleanDir('control/pcaps/pcap_*.hccapx')
     end
 
     logger_cleanup.debug('Cleanup Class() - has completed')
