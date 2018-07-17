@@ -123,7 +123,7 @@ post '/search' do
     p 'results:' + @results.to_s
 
   elsif params[:search_type].to_s == 'ssid'
-    @local_results = HVDB.fetch("SELECT a.ssid, p.id, p.plaintext, p.cracked, p.originalhash, p.hashtype, c.name FROM pcaps p LEFT JOIN pcaphashes a on p.id = a.pcap_id LEFT JOIN pcaps f on a.pcap_id = f.id LEFT JOIN customers c on f.customer_id = c.id WHERE a.ssid like '%" + params[:value] + "%'")
+    @local_results = HVDB.fetch("SELECT a.ssid, p.id, p.plaintext, p.cracked, p.originalhash, p.hashtype, c.name FROM pcaps p LEFT JOIN handshakes a on p.id = a.handshake_id LEFT JOIN pcaps f on a.pcap_id = f.id LEFT JOIN customers c on f.customer_id = c.id WHERE a.ssid like '%" + params[:value] + "%'")
     if @local_results.nil? || @local_results.empty?
       results_entry['local_cracked'] = '0'
     else
@@ -152,10 +152,10 @@ post '/search' do
         if hub_response['status'] == '200'
             @hub_hash_results = hub_response['pcaps']
             @hub_hash_results.each do |entry|
-              results_entry['originalpcap'] = entry['ciphertext'] if entry['cracked'] == '1'
+              results_entry['originalhandshake'] = entry['ciphertext'] if entry['cracked'] == '1'
               results_entry['hashtype'] = entry['hashtype'] if entry['cracked'] == '1'
               results_entry['show_hub_results'] = '1'
-              results_entry['hub_pcap_id'] = entry['pcap_id']
+              results_entry['hub_handshake_id'] = entry['handshake_id']
               results_entry['hub_cracked'] = '1' if entry['cracked'] == '1'
               results_entry['hub_cracked'] = '0' if entry['cracked'] == '0' || entry['cracked'].nil?
             end

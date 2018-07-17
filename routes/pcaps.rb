@@ -8,9 +8,9 @@ get '/pcaps/list' do
   @local_uncracked_cnt = {}
 
   @pcaps.each do |pcap|
-    pcap_cracked_count = HVDB.fetch('SELECT COUNT(p.originalpcap) as count FROM pcaps p LEFT JOIN pcaphashes a ON p.id = a.pcap_id WHERE (a.pcap_id = ? AND p.cracked = 1)', pcap.id)[:count]
+    pcap_cracked_count = HVDB.fetch('SELECT COUNT(p.originalpcap) as count FROM handshakes p LEFT JOIN pcaphandshakes a ON p.id = a.handshake_id WHERE (a.pcapfile_id = ? AND p.cracked = 1)', pcap.id)[:count]
     pcap_cracked_count = pcap_cracked_count[:count]
-    pcap_total_count = HVDB.fetch('SELECT COUNT(p.originalpcap) as count FROM pcaps p LEFT JOIN pcaphashes a ON p.id = a.pcap_id WHERE a.pcap_id = ?', pcap.id)[:count]
+    pcap_total_count = HVDB.fetch('SELECT COUNT(p.originalpcap) as count FROM handshakes p LEFT JOIN pcaphandshakes a ON p.id = a.handshake_id WHERE a.pcapfile_id = ?', pcap.id)[:count]
     pcap_total_count = pcap_total_count[:count]
     @local_cracked_cnt[pcap.id] = pcap_cracked_count.to_s
     @local_uncracked_cnt[pcap.id] = pcap_total_count.to_i - pcap_cracked_count.to_i
@@ -23,8 +23,8 @@ end
 get '/pcaps/delete' do
   varWash(params)
 
-  pcaphashes = HVDB[:pcaphashes]
-  pcaphashes.filter(pcap_id: params[:pcap_id]).delete
+  pcaphandshakes = HVDB[:pcaphandshakes]
+  pcaphandshakes.filter(pcap_id: params[:pcap_id]).delete
 
   pcap = HVDB[:pcaps]
   pcap.filter(id: params[:pcap_id]).delete

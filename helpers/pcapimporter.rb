@@ -4,7 +4,7 @@ def ssid(ssid)
   ssid =~ /\$/ ? true : false
 end
 
-def getMode(pcap)
+def getMode(handshake)
   @modes = []
   @modes.push('2500') # WPA/WPA2
 end

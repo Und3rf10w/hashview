@@ -146,7 +146,7 @@ class Pcaps < Sequel::Model(:pcaps)
 end
 
 # Table for managing association between ssids and hashes
-class Pcaphashes < Sequel::Model(:pcaphashes)
+class Handshakes < Sequel::Model(:handshakes)
 
 end
 
