@@ -166,19 +166,19 @@
           / IF triggered AFTER atleast one pcap file is assigned to customer record
           %form{name: 'pc_form', id: 'pc_form', class: 'form-horizontal', action: '/jobs/assign_pcap', method: 'post'}
             .form-group
-                %label.control-label.col-xs-2{for: ''} Pcap Files
-                .col-xs-8
-                  %select.form-control{id: 'pcap', name: 'pcap', onchange: 'showDiv()'}
-                    - @pcaps.each do |pcap|
-                      / - if params[:edit] == '1'
-                      /   - if @job.pcap_id == pcap.id
-                      /     %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button', selected: 'selected'} #{pcap.name} - #{@cracked_status[pcap.id]}
-                        / - else
-                          / %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
-                      / - else
-                        / %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
-                      %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
-                    %option{value: 'add_new', name: 'pcap_id', type: 'button'} New Pcap
+              %label.control-label.col-xs-2{for: ''} Pcap Files
+              .col-xs-8
+                %select.form-control{id: 'pcap', name: 'pcap', onchange: 'showDiv()'}
+                  - @pcaps.each do |pcap|
+                    -# - if params[:edit] == '1'
+                    -#   - if @job.pcap_id == pcap.id
+                    -#     %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button', selected: 'selected'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                    -#   - else
+                    -#     %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                    -# - else
+                    -#   %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                    %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                  %option{value: 'add_new', name: 'pcap_id', type: 'button'} New Pcap
             .section
               %div{class: "label_leftalign field"}
                 #selectfile_div{style: "display:inline"}
@@ -188,10 +188,10 @@
                       %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
                       %input{type: 'hidden', name: 'form_id', value: '3'}
                       %br
-                      / - if params[:edit] == '1'
-                      /   %input{type: 'hidden', name: 'edit', value: "#{params[:edit].to_s}"}
-                      /   %button.btn.btn-primary{type: 'submit'} Update
-                      / - else
+                      -# - if params[:edit] == '1'
+                      -#   %input{type: 'hidden', name: 'edit', value: "#{params[:edit].to_s}"}
+                      -#   %button.btn.btn-primary{type: 'submit'} Update
+                      -# - else
                         .col-md-1.pull-right
                           %button.btn.btn-primary{type: 'submit'} Select
 

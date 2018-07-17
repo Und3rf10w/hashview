@@ -226,6 +226,38 @@ get '/v1/jobtask/:jobtask_id/hashfile/:hashfile_id' do
 
 end
 
+get '/v1/jobtask/:jobtask_id/pcap/:pcap_id' do
+  # is agent authorized
+  redirect to('/v1/notauthorized') unless agentAuthorized(request.cookies['agent_uuid'])
+
+  jobtask_id = params[:jobtask_id]
+  pcap_id = params[:pcap_id]
+
+  # we need jobtask info to make hashfile path
+  jobtasks = Jobtasks.first(id: jobtask_id)
+
+  @hash_ids = Set.new
+  Pcapfilehandshakes.where(pcap_id: pcap_id).select(:handshake_id).each do |entry|
+    @handshake_ids.add(entry.handshake_id)
+  end
+  targets = Handshakes.where(id: @handshake_ids.to_a, cracked: 0).select(:originalhash).all
+
+  pcap_file = 'control/pcaps/pcap_' + jobtasks.job_id.to_s + '_' + jobtasks.task_id.to_s + '.hccapx'
+  hashtype_target = Handshakes.first(id: @pcap_ids.to_a)
+  hashtype = hashtype_target.hashtype.to_s
+
+  # if requester is local agent, write directly to disk, otherwise serve as download
+  File.open(pcap_file, 'w') do |f|
+    targets.each do |entry|
+      f.puts entry.originalhash
+    end
+    f.close
+  end
+
+  send_file pcap_file
+
+end
+
 # accept uploaded crack files
 post '/v1/jobtask/:jobtask_id/crackfile/upload' do
   # is agent authorized
