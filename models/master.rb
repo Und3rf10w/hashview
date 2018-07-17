@@ -151,7 +151,7 @@ class Pcapfilehandshakes < Sequel::Model(:pcapfilehandshakes)
 end
 
 # Table for handling handshakes cracked and uncracked
-class Handshakes < Sequel::model(:handshakes)
+class Handshakes < Sequel::Model(:handshakes)
 
 end
 
