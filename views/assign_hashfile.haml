@@ -162,21 +162,76 @@
 
       %br
       .col-md-8
-        %form{method: 'post', class: 'form-horizontal', action: '/customers/upload/pcap', enctype: 'multipart/form-data'}
-          .form-group
-            %label.control-label.col-xs-2{for: ''} Name
-            .col-xs-10
-              %input{type: 'textbox', name: 'pcap_name', id: 'pcap_name'}
+        - if !@pcaps.empty?
+          / IF triggered AFTER atleast one pcap file is assigned to customer record
+          %form{name: 'pc_form', id: 'pc_form', class: 'form-horizontal', action: '/jobs/assign_pcapfile', method: 'post'}
+            .form-group
+                %label.control-label.col-xs-2{for: ''} Pcap Files
+                .col-xs-8
+                  %select.form-control{id: 'pcap_file', name: 'pcap_file', onchange: 'showDiv()'}
+                    - @pcaps.each do |pcap|
+                      / - if params[:edit] == '1'
+                      /   - if @job.pcap_id == pcap.id
+                      /     %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button', selected: 'selected'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                        / - else
+                          / %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                      / - else
+                        / %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                      %option{value: "#{pcap.id}", name: 'pcap_id', type: 'button'} #{pcap.name} - #{@cracked_status[pcap.id]}
+                    %option{value: 'add_new', name: 'pcap_id', type: 'button'} New Pcap
+            .section
+              %div{class: "label_leftalign field"}
+                #selectfile_div{style: "display:inline"}
+                  .form-group
+                    .col-xs-offset-2.col-xs-8
+                      %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
+                      %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
+                      %input{type: 'hidden', name: 'form_id', value: '2'}
+                      %br
+                      / - if params[:edit] == '1'
+                      /   %input{type: 'hidden', name: 'edit', value: "#{params[:edit].to_s}"}
+                      /   %button.btn.btn-primary{type: 'submit'} Update
+                      / - else
+                        .col-md-1.pull-right
+                          %button.btn.btn-primary{type: 'submit'} Select
 
-          .form-group
-            %label.control-label.col-xs-2{for: ''} Pcap file
-            .col-xs-10
-              %input{type: 'file', name: 'pcap', id: 'pcapUp', class: 'inputFiles_cust', onchange: 'setFileName()'}
-              %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
-              %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
-              %input{type: 'hidden', name: 'form_id', value: '3'}
+                #hashfile_div{style: "display:none"}
+                  %form{method: 'post', class: 'form-horizontal', action: '/customers/upload/pcap', enctype: 'multipart/form-data'}
+                    .form-group
+                      %label.control-label.col-xs-2 Name:
+                      .col-xs-10
+                        %input{type: 'textbox', name: 'pcap_name', id: 'pcap_name'}
+                    .form-group
+                      %label.control-label.col-xs-2 Pcap File:
+                      .col-xs-10
+                        %input{type: 'file', name: 'pcap', id: 'pcapUp', class: 'inputFiles_cust', onchange: 'setFileName()'}
+                        %br
+                        Note: Hashview currently supports the following pcap types: hccapx
+                        %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
+                        %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
+                        %input{type: 'hidden', name: 'form_id', value: '3'}
+                    .form-group
+                      .col-xs-offset-2.col-xs-10
+                        .col-xs-3.pull-right
+                          %button.btn.btn-primary{type: 'submit'} Upload
 
-          .form-group
-            .col-xs-offset-2.col-xs-10
-              .col-md-1.pull-right
-                %button.btn.btn-primary{type:'submit'} Upload
+
+        - else
+          %form{method: 'post', class: 'form-horizontal', action: '/customers/upload/pcap', enctype: 'multipart/form-data'}
+            .form-group
+              %label.control-label.col-xs-2{for: ''} Name:
+              .col-xs-10
+                %input{type: 'textbox', name: 'pcap_name', id: 'pcap_name'}
+
+            .form-group
+              %label.control-label.col-xs-2{for: ''} Pcap file:
+              .col-xs-10
+                %input{type: 'file', name: 'pcap', id: 'pcapUp', class: 'inputFiles_cust', onchange: 'setFileName()'}
+                %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
+                %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
+                %input{type: 'hidden', name: 'form_id', value: '3'}
+
+            .form-group
+              .col-xs-offset-2.col-xs-10
+                .col-md-1.pull-right
+                  %button.btn.btn-primary{type:'submit'} Upload
