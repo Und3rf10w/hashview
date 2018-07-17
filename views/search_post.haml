@@ -26,6 +26,11 @@
                       %option{value: 'password', name: 'search_type', type: 'button', selected: 'selected'} Password
                     - else
                       %option{value: 'password', name: 'search_type', type: 'button'} Password
+                    - if params[:search_type] == 'ssid'
+                      %option{value: 'ssid', name: 'search_type', type: 'button', selected:'selected'} SSID
+                    - else
+                      %option{value: 'ssid', name: 'search_type', type: 'button'} SSID
+
                 .form-group.col-md-8
                   %input{type: 'textbox', class: 'form-control', name: 'value', id: 'value', placeholder: 'Search for...'}
                 .form-group.col-xs-2
