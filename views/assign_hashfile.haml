@@ -56,6 +56,8 @@
       %a{"data-toggle" => 'tab', href: '#1'} Individual Hashes
     %li
       %a{"data-toggle" => 'tab', href: '#2'} Hashfile
+    %li
+      %a{"data-toggle" => 'tab', href: '#3'} Pcap
   .tab-content
     #1.tab-pane.active
       
@@ -134,7 +136,6 @@
                       .col-xs-offset-2.col-xs-10
                         .col-xs-3.pull-right
                           %button.btn.btn-primary{type: 'submit'} Upload
-
         - else
           / ELSE triggered if NO hash files have ever been uploaded
           / OOTB state      
@@ -156,3 +157,26 @@
               .col-xs-offset-2.col-xs-10
                 .col-md-1.pull-right
                   %button.btn.btn-primary{type: 'submit'} Upload
+
+    #3.tab-pane
+
+      %br
+      .col-md-8
+        %form{method: 'post', class: 'form-horizontal', action: '/customers/upload/pcap', enctype: 'multipart/form-data'}
+          .form-group
+            %label.control-label.col-xs-2{for: ''} Name
+            .col-xs-10
+              %input{type: 'textbox', name: 'pcap_name', id: 'pcap_name'}
+
+          .form-group
+            %label.control-label.col-xs-2{for: ''} Pcap file
+            .col-xs-10
+              %input{type: 'file', name: 'pcap', id: 'pcapUp', class: 'inputFiles_cust', onchange: 'setFileName()'}
+              %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
+              %input{type: 'hidden', name: 'customer_id', value: "#{params[:customer_id].to_s}"}
+              %input{type: 'hidden', name: 'form_id', value: '3'}
+
+          .form-group
+            .col-xs-offset-2.col-xs-10
+              .col-md-1.pull-right
+                %button.btn.btn-primary{type:'submit'} Upload
