@@ -125,6 +125,46 @@ post '/customers/upload/hashfile' do
   redirect to("/customers/upload/verify_filetype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&hashid=#{hashfile.id}")
 end
 
+post '/customers/upload/pcap' do
+  if params[:pcap_name].nil? || params[:pcap_name].empty?
+    flash[:error] = 'You must assign a name for this pcap'
+    redirect to("/jobs/assign_hashfile?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}")
+  end
+
+  if params[:file].nil? || params[:file].empty?
+    flash[:error] = 'You must specificy a pcap'
+    redirect to("/jobs/assign_hashfile?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}")
+  end
+
+  @job = Jobs.first(id: params[:job_id])
+  return 'No such job exists' unless @job
+
+  # Remporarily save file for testing
+  hash = rand(36**6).to_s(36)
+  pcapfile = "control/pcaps/pcap_upload_job_id-#{@job.id}-#{hash}.hccapx"
+
+  # Parse uploaded file into an array
+  pcap_array = []
+  whole_file_as_string_object = params[:file][:tempfile].read
+  File.open(pcapfile, 'w') { |f| f.write(whole_file_as_string_object) }
+  whole_file_as_string_object.each_line do |line|
+    hash_array << line
+  end
+
+  # save location of tmp pcap file
+  pcapfile = Pcaps.new
+  pcapfile.name = params[:pcap_name]
+  pcapfile.customer_id = params[:customer_id]
+  pcapfile.hash_str = hash
+  pcapfile.save
+
+  @job.save
+
+  # TODO: Need to eventually add sanity checks to make sure that the file uploaded was a pcap
+  # redirect to("/customers/upload/verify_filetype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&hashid=#{pcapfile.id}")
+  
+end
+
 post '/customers/upload/hashes' do
   # varWash(params)
 
