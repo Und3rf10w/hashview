@@ -162,7 +162,7 @@
 
       %br
       .col-md-8
-        - if !@pcaps.empty?
+        - if !@pcaps.nil?
           / IF triggered AFTER atleast one pcap file is assigned to customer record
           %form{name: 'pc_form', id: 'pc_form', class: 'form-horizontal', action: '/jobs/assign_pcap', method: 'post'}
             .form-group
@@ -198,11 +198,11 @@
                 #hashfile_div{style: "display:none"}
                   %form{method: 'post', class: 'form-horizontal', action: '/customers/upload/pcap', enctype: 'multipart/form-data'}
                     .form-group
-                      %label.control-label.col-xs-2 Name:
+                      %label.control-label.col-xs-2 Name
                       .col-xs-10
                         %input{type: 'textbox', name: 'pcap_name', id: 'pcap_name'}
                     .form-group
-                      %label.control-label.col-xs-2 Pcap File:
+                      %label.control-label.col-xs-2 Pcap File
                       .col-xs-10
                         %input{type: 'file', name: 'pcap', id: 'pcapUp', class: 'inputFiles_cust', onchange: 'setFileName()'}
                         %br
