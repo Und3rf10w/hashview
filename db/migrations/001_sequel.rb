@@ -55,7 +55,6 @@ Sequel.migration do
       index [:hashfile_id], name: :index_hashfilehashes_hashfile_id
     end
 
-
     create_table(:hashfiles) do
       primary_key :id, type: :Bignum
       Integer :customer_id
