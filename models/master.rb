@@ -140,6 +140,16 @@ class Hashfilehashes < Sequel::Model(:hashfilehashes)
 
 end
 
+# Table for handling pcaps cracked and uncracked
+class Pcaps < Sequel::Model(:pcaps)
+
+end
+
+# Table for managing association between ssids and hashes
+class Pcaphashes < Sequel::Model(:pcaphashes)
+
+end
+
 # User Settings
 class Settings < Sequel::Model(:settings)
 
