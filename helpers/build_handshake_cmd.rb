@@ -16,8 +16,8 @@ helpers do
     @task = Tasks.first(id: task_id)
     @job = Jobs.first(id: job_id)
     rules_file = Rules.first(id: @task.hc_rule)
-    pcapfile_id = @job.pcapfile_id
-    handshake_id = Pcapfilehashes.first(Pcapfile_id: pcapfile_id).handshake_id
+    pcap_id = @job.pcap_id
+    handshake_id = Pcapfilehandshakes.first(Pcap_id: pcap_id).handshake_id
     hashtype = Handshakes.first(id: handshake_id).hashtype.to_s
 
     attackmode = @task.hc_attackmode.to_s
