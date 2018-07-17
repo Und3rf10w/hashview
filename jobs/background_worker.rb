@@ -124,6 +124,12 @@ class Api
     return self.get(url)
   end
 
+  # download pcap
+  def self.pcap(jobtask_id, pcap_id)
+    url = "https://#{@server}/v1/jobtask/#{jobtask_id}/pcap/#{pcap_id}"
+    return self.get(url)
+  end
+  
   # wordlists
   def self.get_updateSmartWordlist()
     url = "https://#{@server}/v1/updateSmartWordlist"
