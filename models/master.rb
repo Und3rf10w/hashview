@@ -2,6 +2,7 @@ require 'rubygems'
 require 'sequel'
 require 'bcrypt'
 require 'rotp'
+require 'bindata'
 
 Sequel::Model.plugin :json_serializer
 
@@ -138,6 +139,24 @@ end
 # Table for managing association between users and hashes
 class Hashfilehashes < Sequel::Model(:hashfilehashes)
 
+end
+
+# Class for handling hccapx files
+class Hccapx < BinData::Record
+  endian :big
+  uint32 :signature
+  uint32 :version
+  uint8 :message_pair
+  uint8 :essid_len
+  string :essid, :length => 32, :trim_padding => true
+  uint8 :keyver
+  uint8 :keymic, :length => 16
+  uint8 :mac_ap, :length => 6
+  uint8 :nonce_ap, :length => 32
+  uint8 :mac_sta, :length => 6
+  uint8 :nonce_sta, :length => 32
+  uint16 :eapol_len
+  uint8 :eapol, :length => 256
 end
 
 # Pcaps class

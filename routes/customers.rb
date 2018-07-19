@@ -157,8 +157,7 @@ post '/customers/upload/pcap' do
 
   @job.save
 
-  # TODO: Need to eventually add sanity checks to make sure that the file uploaded was a pcap
-  # redirect to("/customers/upload/verify_filetype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&hashid=#{pcapfile.id}")
+  redirect to("/customers/upload/verify_pcap?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{pcapfile.id}")
   
 end
 
@@ -224,6 +223,27 @@ post '/customers/upload/verify_filetype' do
   redirect to("/customers/upload/verify_hashtype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&hashid=#{params[:hashid]}&filetype=#{params[:filetype]}")
 end
 
+get '/customers/upload/verify_pcap' do
+  varWash(params)
+
+  @filetypes = ['hccapx']
+  @job = Jobs.first(id: params[:job_id])
+  haml :verify_pcaps
+end
+
+post '/customers/upload/verify_pcap' do
+  varWash(params)
+
+  if !params[:filetype] || params[:filetype].nil? || params[:filetype] == '- SELECT -'
+    flash[:error] = 'You must specify a vaild PCAP file type'
+    redirect to("/customers/upload/verify_handshaketype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{params[:pcapid]}&filetype=#{params[:filetype]}")
+  end
+
+  params[:filetype] = 'hccapx' if params[:filetype] = 'hccapx'
+
+  redirect to("/customers/upload/verify_handshaketype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{params[:pcapid]}&filetype=#{params[:filetype]}")
+end
+
 get '/customers/upload/verify_hashtype' do
   varWash(params)
 
@@ -267,6 +287,59 @@ post '/customers/upload/verify_hashtype' do
 
   # Delete file, no longer needed
   File.delete(hash_file)
+
+  url = '/jobs/local_check'
+
+  url += "?job_id=#{params[:job_id]}"
+  url += '&edit=1' if params[:edit]
+  redirect to(url)
+end
+
+get '/customers/upload/verify_handshaketype' do
+  varWash(params)
+
+  pcapfile = Pcaps.first(id: params[:pcapid])
+
+  @hashtypes = detectHashType("control/hashes/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.hccapx", params[:filetype])
+  @job = Jobs.first(id: params[:job_id])
+  haml :verify_hashtypes
+end
+
+post '/customers/upload/verify_handshaketype' do
+  varWash(params)
+
+  filetype = params[:filetype]
+  pcapfile = Pcaps.first(id: params[:pcapid])
+
+  params[:hashtype] == '99999' ? hashtype = params[:manualHash] : hashtype = params[:hashtype]
+
+  pcap_file = "control/hashes/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.txt"
+
+  File.open(pcap_file, 'r').each do |pcap|
+    while (handshake = pcap.read(393)) do
+      a = Hccapx.new
+      ssid = a.read(handshake).essid
+      unless importHandshake(handshake, filetype, hashtype, pcap.id)
+        flash[:error] = 'Error importing pcap'
+        redirect to("/customers/upload/verify_handshaketype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{params[:pcapid]}&filetype=#{params[:filetype]}")
+      end
+    end
+  end
+
+  @job = Jobs.first(id: params[:job_id])
+  @job.pcap_id = pcap.id
+  @job.save
+
+  total_cnt = HVDB.fetch('SELECT COUNT(h.encodedhandshake) FROM pcaps h LEFT JOIN pcapfilehandshakes a ON h.id = a.handshake_id WHERE a.pcap_id = ?', pcap.id)[:count]
+  total_cnt = total_cnt[:count]
+
+  unless total_cnt.nil?
+    flash[:success] = 'Successfully uploaded ' + total_cnt + ' handshakes.'
+    #flash[:success] = 'Successfully uploaded ' + total_cnt + ' handshakes taking a total of ' + time.real.to_s + ' seconds.'
+  end
+
+  # Delete file, no longer needed
+  File.delete(pcap_file)
 
   url = '/jobs/local_check'
 

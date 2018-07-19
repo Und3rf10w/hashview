@@ -237,7 +237,7 @@ get '/v1/jobtask/:jobtask_id/pcap/:pcap_id' do
   # we need jobtask info to make hashfile path
   jobtasks = Jobtasks.first(id: jobtask_id)
 
-  @hash_ids = Set.new
+  @handshake_ids = Set.new
   Pcapfilehandshakes.where(pcap_id: pcap_id).select(:handshake_id).each do |entry|
     @handshake_ids.add(entry.handshake_id)
   end
