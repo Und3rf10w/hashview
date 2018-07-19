@@ -111,7 +111,7 @@ post '/customers/upload/hashfile' do
   # save location of tmp hash file
   hashfile = Hashfiles.new
   hashfile.name = params[:hashfile_name]
-  hashfile.customer_id = params[:customer_id]
+  hashfile.customer_id = params[:cust   omer_id]
   hashfile.hash_str = hash
   hashfile.save
 
@@ -316,7 +316,7 @@ post '/customers/upload/verify_handshaketype' do
 
   File.open(pcap_file, 'r').each do |pcap|
     while (handshake = pcap.read(393)) do
-      unless importHandshake(handshake, filetype, pcap.id, hashtype)
+      unless importHandshake(handshake, filetype, pcapfile.id, hashtype)
         flash[:error] = 'Error importing pcap'
         redirect to("/customers/upload/verify_handshaketype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{params[:pcapid]}&filetype=#{params[:filetype]}")
       end
@@ -324,7 +324,7 @@ post '/customers/upload/verify_handshaketype' do
   end
 
   @job = Jobs.first(id: params[:job_id])
-  @job.pcap_id = pcap.id
+  @job.pcap_id = pcapfile.id
   @job.save
 
   total_cnt = HVDB.fetch('SELECT COUNT(h.encodedhandshake) FROM pcaps h LEFT JOIN pcapfilehandshakes a ON h.id = a.handshake_id WHERE a.pcap_id = ?', pcap.id)[:count]
