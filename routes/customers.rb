@@ -107,7 +107,6 @@ post '/customers/upload/hashfile' do
 
   whole_file_as_string_object = params[:file][:tempfile].read
   File.open(hashfile, 'w') { |f| f.write(whole_file_as_string_object) }
-  end
 
   # save location of tmp hash file
   hashfile = Hashfiles.new

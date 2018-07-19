@@ -30,5 +30,5 @@ gem 'foreman'
 gem 'rest-client'
 gem 'digest'
 gem 'logger'
-
+gem 'bindata'
 

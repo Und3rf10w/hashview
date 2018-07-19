@@ -16,8 +16,8 @@ end
 
 
 def friendlyToMode(friendly)
-  return '2500' if friendly = 'WPA/WPA2'
-  return '2501' if friendly = 'WPA/WPA2 PMK'
+  return '2500' if friendly == 'WPA/WPA2'
+  return '2501' if friendly == 'WPA/WPA2 PMK'
 end
 
 
