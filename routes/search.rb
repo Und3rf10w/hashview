@@ -123,7 +123,7 @@ post '/search' do
     p 'results:' + @results.to_s
 
   elsif params[:search_type].to_s == 'ssid'
-    @local_results = HVDB.fetch("SELECT a.ssid, p.id, p.plaintext, p.cracked, p.originalhash, p.hashtype, c.name FROM pcaps p LEFT JOIN handshakes a on p.id = a.handshake_id LEFT JOIN pcaps f on a.pcap_id = f.id LEFT JOIN customers c on f.customer_id = c.id WHERE a.ssid like '%" + params[:value] + "%'")
+    @local_results = HVDB.fetch("SELECT a.ssid, p.id, p.plaintext, p.cracked, p.encodedhandshake, p.hashtype, c.name FROM pcaps p LEFT JOIN handshakes a on p.id = a.handshake_id LEFT JOIN pcaps f on a.pcap_id = f.id LEFT JOIN customers c on f.customer_id = c.id WHERE a.ssid like '%" + params[:value] + "%'")
     if @local_results.nil? || @local_results.empty?
       results_entry['local_cracked'] = '0'
     else
@@ -135,15 +135,15 @@ post '/search' do
       results_entry['ssid'] = local_entry[:ssid]
       results_entry['plaintext'] = local_entry[:plaintext]
       results_entry['hashtype'] = local_entry[:hashtype]
-      results_entry['originalhash'] = local_entry[:originalhash]
+      results_entry['encodedhandshake'] = local_entry[:encodedhandshake]
       results_entry['name'] = local_entry[:name]
       results_entry['local_cracked'] = '1' if local_entry[:cracked]
       results_entry['local_cracked'] = '0' unless local_entry[:cracked]
 
-      if hub_settings.status == 'registered' && local_entry[:originalhash]
+      if hub_settings.status == 'registered' && local_entry[:encodedhandshake]
         @hash_array = []
         element = {}
-        element['ciphertext'] = local_entry[:originalhash]
+        element['ciphertext'] = local_entry[:encodedhandshake]
         element['hashtype'] = local_entry[:hashtype].to_s
         @hash_array.push(element)
         hub_response = Hub.hashSearch(@hash_array)
@@ -152,7 +152,7 @@ post '/search' do
         if hub_response['status'] == '200'
             @hub_hash_results = hub_response['pcaps']
             @hub_hash_results.each do |entry|
-              results_entry['originalhandshake'] = entry['ciphertext'] if entry['cracked'] == '1'
+              results_entry['originalhandshake'] = entry['encodedhandshake'] if entry['cracked'] == '1'
               results_entry['hashtype'] = entry['hashtype'] if entry['cracked'] == '1'
               results_entry['show_hub_results'] = '1'
               results_entry['hub_handshake_id'] = entry['handshake_id']

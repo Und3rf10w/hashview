@@ -1,4 +1,5 @@
 # my shameful attempt at implementing a REST API
+require 'base64'
 
 get '/v1/notauthorized' do
   {
@@ -240,7 +241,7 @@ get '/v1/jobtask/:jobtask_id/pcap/:pcap_id' do
   Pcapfilehandshakes.where(pcap_id: pcap_id).select(:handshake_id).each do |entry|
     @handshake_ids.add(entry.handshake_id)
   end
-  targets = Handshakes.where(id: @handshake_ids.to_a, cracked: 0).select(:originalhash).all
+  targets = Handshakes.where(id: @handshake_ids.to_a, cracked: 0).select(:encodedhandshake).all
 
   pcap_file = 'control/pcaps/pcap_' + jobtasks.job_id.to_s + '_' + jobtasks.task_id.to_s + '.hccapx'
   hashtype_target = Handshakes.first(id: @pcap_ids.to_a)
@@ -249,7 +250,7 @@ get '/v1/jobtask/:jobtask_id/pcap/:pcap_id' do
   # if requester is local agent, write directly to disk, otherwise serve as download
   File.open(pcap_file, 'w') do |f|
     targets.each do |entry|
-      f.puts entry.originalhash
+      f.puts Base64.decode64(entry.encodedhandshake)
     end
     f.close
   end

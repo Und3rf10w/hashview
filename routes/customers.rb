@@ -105,12 +105,8 @@ post '/customers/upload/hashfile' do
   hash = rand(36**8).to_s(36)
   hashfile = "control/hashes/hashfile_upload_job_id-#{@job.id}-#{hash}.txt"
 
-  # Parse uploaded file into an array
-  hash_array = []
   whole_file_as_string_object = params[:file][:tempfile].read
   File.open(hashfile, 'w') { |f| f.write(whole_file_as_string_object) }
-  whole_file_as_string_object.each_line do |line|
-    hash_array << line
   end
 
   # save location of tmp hash file
@@ -144,11 +140,12 @@ post '/customers/upload/pcap' do
   pcapfile = "control/pcaps/pcap_upload_job_id-#{@job.id}-#{hash}.hccapx"
 
   # Parse uploaded file into an array
+  # TODO: Need to fix this. Looks like 
   pcap_array = []
   whole_file_as_string_object = params[:file][:tempfile].read
   File.open(pcapfile, 'w') { |f| f.write(whole_file_as_string_object) }
   whole_file_as_string_object.each_line do |line|
-    hash_array << line
+    pcap_array << line
   end
 
   # save location of tmp pcap file
