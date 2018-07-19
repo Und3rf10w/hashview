@@ -43,8 +43,8 @@ def importHccapx(handshake, pcap_id, type)
 	@handshake_id = Handshakes.first(encodedhandshake: Base64.encode64(handshake), hashtype: type)
 	if @handshake_id.nil?
 		addHandshake(handshake, type)
-		@handshake = Handshakes.first(encodedhandshake: Base64.encode64(handshake), hashtype: type)
-	elsif @handshake_id && handshake_id[:hashtype].to_s != type.to_s
+		@handshake_id = Handshakes.first(encodedhandshake: Base64.encode64(handshake), hashtype: type)
+	elsif @handshake_id && @handshake_id[:hashtype].to_s != type.to_s
 		unless @handshake_id[:cracked]
 			@handshake_id[:hashtype] = type.to_i
 			@handshake_id.save
@@ -59,4 +59,17 @@ def importHandshake(handshake, file_type, pcap_id, hashtype)
   else
   	return 'Unsupported pcap format detected'
   end
+end
+
+
+def detectHandshakeType(pcap_file, file_type)
+	@hashtypes = []
+	# TODO: Implement a check for determining the difference bewteen PMK and not
+	if file_type == 'hccapx'
+		@modes = getMode(2500)
+		@modes.each do |mode|
+			@hashtypes.push(mode) unless @hashtypes.include?(mode) # WPA/WPA2
+		end
+	end
+	@hashtypes
 end

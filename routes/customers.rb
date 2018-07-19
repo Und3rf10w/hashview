@@ -111,7 +111,7 @@ post '/customers/upload/hashfile' do
   # save location of tmp hash file
   hashfile = Hashfiles.new
   hashfile.name = params[:hashfile_name]
-  hashfile.customer_id = params[:cust   omer_id]
+  hashfile.customer_id = params[:customer_id]
   hashfile.hash_str = hash
   hashfile.save
 
@@ -138,14 +138,8 @@ post '/customers/upload/pcap' do
   hash = rand(36**6).to_s(36)
   pcapfile = "control/pcaps/pcap_upload_job_id-#{@job.id}-#{hash}.hccapx"
 
-  # Parse uploaded file into an array
-  # TODO: Need to fix this. Looks like 
-  pcap_array = []
   whole_file_as_string_object = params[:file][:tempfile].read
   File.open(pcapfile, 'w') { |f| f.write(whole_file_as_string_object) }
-  whole_file_as_string_object.each_line do |line|
-    pcap_array << line
-  end
 
   # save location of tmp pcap file
   pcapfile = Pcaps.new
@@ -234,7 +228,7 @@ post '/customers/upload/verify_pcap' do
   varWash(params)
 
   if !params[:filetype] || params[:filetype].nil? || params[:filetype] == '- SELECT -'
-    flash[:error] = 'You must specify a vaild PCAP file type'
+    flash[:error] = 'You must specify a vaild PCAP file type.'
     redirect to("/customers/upload/verify_handshaketype?customer_id=#{params[:customer_id]}&job_id=#{params[:job_id]}&pcapid=#{params[:pcapid]}&filetype=#{params[:filetype]}")
   end
 
@@ -284,7 +278,7 @@ post '/customers/upload/verify_hashtype' do
     #flash[:success] = 'Successfully uploaded ' + total_cnt + ' hashes taking a total of ' + time.real.to_s + ' seconds.'
   end
 
-  # Delete file, no longer needed
+  # Delete file, no longer needepcd
   File.delete(hash_file)
 
   url = '/jobs/local_check'
@@ -299,9 +293,9 @@ get '/customers/upload/verify_handshaketype' do
 
   pcapfile = Pcaps.first(id: params[:pcapid])
 
-  @hashtypes = detectHashType("control/hashes/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.hccapx", params[:filetype])
+  @hashtypes = detectHandshakeType("control/pcaps/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.hccapx", params[:filetype])
   @job = Jobs.first(id: params[:job_id])
-  haml :verify_hashtypes
+  haml :verify_handshaketypes
 end
 
 post '/customers/upload/verify_handshaketype' do
@@ -312,9 +306,9 @@ post '/customers/upload/verify_handshaketype' do
 
   params[:hashtype] == '99999' ? hashtype = params[:manualHash] : hashtype = params[:hashtype]
 
-  pcap_file = "control/hashes/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.txt"
+  pcap_file = "control/pcaps/pcap_upload_job_id-#{params[:job_id]}-#{pcapfile.hash_str}.hccapx"
 
-  File.open(pcap_file, 'r').each do |pcap|
+  File.open(pcap_file, 'r') do |pcap|
     while (handshake = pcap.read(393)) do
       unless importHandshake(handshake, filetype, pcapfile.id, hashtype)
         flash[:error] = 'Error importing pcap'
@@ -324,10 +318,10 @@ post '/customers/upload/verify_handshaketype' do
   end
 
   @job = Jobs.first(id: params[:job_id])
-  @job.pcap_id = pcapfile.id
+  @job.hashfile_id = pcapfile.id
   @job.save
 
-  total_cnt = HVDB.fetch('SELECT COUNT(h.encodedhandshake) FROM pcaps h LEFT JOIN pcapfilehandshakes a ON h.id = a.handshake_id WHERE a.pcap_id = ?', pcap.id)[:count]
+  total_cnt = HVDB.fetch('SELECT COUNT(h.encodedhandshake) FROM handshakes h LEFT JOIN pcapfilehandshakes a ON h.id = a.handshake_id WHERE a.pcap_id = ?', pcapfile.id)[:count]
   total_cnt = total_cnt[:count]
 
   unless total_cnt.nil?

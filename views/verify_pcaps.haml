@@ -24,7 +24,7 @@
                     %option{value: 'none', name: 'filetype', type: 'button'} - SELECT -
                     - @filetypes.each do |type|
                       %option{value: "#{type}", name: 'filetype', type: 'button'} #{type}
-                  %input{type: 'hidden', name: 'hashid', value: "#{params[:hashid].to_s}"}
+                  %input{type: 'hidden', name: 'pcapid', value: "#{params[:pcapid].to_s}"}
               .form-group
                 .col-xs-offset-2.col-xs-10
                   %input{type: 'hidden', name: 'job_id', value: "#{params[:job_id].to_s}"}
