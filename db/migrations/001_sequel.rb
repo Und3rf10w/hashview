@@ -66,19 +66,19 @@ Sequel.migration do
     create_table(:handshakes, ignore_index_errors: true) do
       primary_key :id
       DateTime :lastupdated
-      String :originalhash, size: 4096
+      String :encodedhandshake, size: 550
       Integer :hashtype
       TrueClass :cracked
       String :plaintext, size: 256
 
       index [:hashtype], name: :index_of_hashtypes
-      index [:originalhash], name: :index_of_orignalhashes, unique: true
+      index [:encodedhandshake], name: :index_of_encodedhandshakes, unique: true
     end
 
     create_table(:pcapfilehandshakes) do
       primary_key :id, type: :Bignum
       Integer :handshake_id
-      String :ssid, size: 256
+      String :ssid, size: 128
       Integer :pcap_id
 
       index [:handshake_id], name: :index_pcapfilehandshakes_handshake_id
@@ -89,7 +89,7 @@ Sequel.migration do
       primary_key :id, type: :Bignum
       Integer :customer_id
       String :name, size: 256
-      String :handshake_str, size: 256
+      String :hash_str, size: 256
       Integer :total_run_time, default: 0
     end
 
